@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}Registrations for {{ event.event_name }}{% endblock %}
+
+{% block content %}
+<div class="page-content">
+
+  <div class="page-top" style="margin-bottom: 20px;">
+    <div>
+      <div class="page-eyebrow">E V E N T R E G I S T R A T I O N S</div>
+      <h1 class="page-title">{{ event.event_name }}</h1>
+      <p class="page-subtitle">{{ event.event_date }} • {{ event.venue }}</p>
+    </div>
+    <div style="display: flex; gap: 10px;">
+      <a href="{{ url_for('events') }}" class="btn btn-ghost">
+        <i data-lucide="arrow-left" class="btn-icon"></i> Back to Events
+      </a>
+      <a href="{{ url_for('add_registration', event_id=event.event_id) }}" class="btn btn-primary">
+        <i data-lucide="plus" class="btn-icon"></i> Register Participant
+      </a>
+    </div>
+  </div>
+
+  <!-- Event Summary & Quick Selector -->
+  <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; flex-wrap: wrap; gap: 20px;">
+    
+    <!-- Summary -->
+    <div style="background: var(--surface); padding: 16px 24px; border-radius: var(--r); border: 1px solid var(--border); box-shadow: var(--sh-sm); flex-grow: 1; max-width: 400px; display: flex; gap: 24px; align-items: center;">
+      <div>
+        <div style="font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px;">Total Registered</div>
+        <div style="font-size: 28px; font-weight: 800; color: var(--teal); line-height: 1;">{{ registrations|length }}</div>
+      </div>
+      <div style="width: 1px; height: 40px; background: var(--border);"></div>
+      <div>
+        <div style="font-size: 13px; color: var(--text);"><strong>Venue:</strong> {{ event.venue }}</div>
+        <div style="font-size: 13px; color: var(--muted); margin-top: 4px;">{{ event.description or 'No description provided.' }}</div>
+      </div>
+    </div>
+
+    <!-- Quick Selector -->
+    <div style="background: var(--surface); padding: 12px 20px; border-radius: var(--r); border: 1px solid var(--border); box-shadow: var(--sh-sm); display: flex; align-items: center; gap: 12px;">
+      <span style="font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em;">Switch Event:</span>
+      <select class="form-select" style="min-width: 240px; padding: 6px 12px; font-size: 13px; background-position: right 10px center;" onchange="if(this.value) window.location.href='/events/'+this.value+'/registrations'">
+        {% for e in all_events %}
+        <option value="{{ e.event_id }}" {% if event.event_id == e.event_id %}selected{% endif %}>{{ e.event_name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+
+  {% if registrations %}
+  <div class="table-container">
+    <table class="data-table" id="event-registrations-table">
+      <thead>
+        <tr>
+          <th class="sortable" data-type="numeric">Reg ID <span class="sort-icon-container"><i data-lucide="arrow-up-down" class="sort-icon"></i></span></th>
+          <th class="sortable" data-type="numeric">Participant ID <span class="sort-icon-container"><i data-lucide="arrow-up-down" class="sort-icon"></i></span></th>
+          <th class="sortable" data-type="text">Name <span class="sort-icon-container"><i data-lucide="arrow-up-down" class="sort-icon"></i></span></th>
+          <th class="sortable" data-type="text">Email <span class="sort-icon-container"><i data-lucide="arrow-up-down" class="sort-icon"></i></span></th>
+          <th class="sortable" data-type="text">Phone <span class="sort-icon-container"><i data-lucide="arrow-up-down" class="sort-icon"></i></span></th>
+          <th class="sortable" data-type="date">Reg. Date <span class="sort-icon-container"><i data-lucide="arrow-up-down" class="sort-icon"></i></span></th>
+          <th class="sortable" data-type="text">Status <span class="sort-icon-container"><i data-lucide="arrow-up-down" class="sort-icon"></i></span></th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for reg in registrations %}
+        <tr id="registration-row-{{ reg.registration_id }}">
+          <td class="td-id">{{ reg.registration_id }}</td>
+          <td class="td-id">{{ reg.participant_id }}</td>
+          <td class="td-bold">{{ reg.participant_name }}</td>
+          <td>{{ reg.email }}</td>
+          <td>{{ reg.phone }}</td>
+          <td class="td-muted">{{ reg.registration_date }}</td>
+          <td>
+            <span class="badge badge-{{ reg.status | lower }}">{{ reg.status }}</span>
+          </td>
+          <td class="td-actions">
+            <!-- UPDATE -->
+            <a href="{{ url_for('edit_registration', registration_id=reg.registration_id) }}"
+               class="btn-action btn-edit"
+               id="btn-edit-reg-{{ reg.registration_id }}">
+              <i data-lucide="edit-3" class="btn-icon"></i> Edit
+            </a>
+
+            <!-- DELETE -->
+            <form method="POST"
+                  action="{{ url_for('delete_registration', registration_id=reg.registration_id) }}"
+                  style="margin:0; display:inline;"
+                  onsubmit="return confirmDelete('Delete this registration for {{ reg.participant_name }}?')">
+              <button type="submit"
+                      class="btn-action btn-delete"
+                      id="btn-delete-reg-{{ reg.registration_id }}">
+                <i data-lucide="trash-2" class="btn-icon"></i> Delete
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="table-container empty-state" style="border: 1px dashed var(--border); box-shadow: none; background: transparent;">
+    <div class="empty-icon-box">
+      <i data-lucide="users" stroke-width="2"></i>
+    </div>
+    <div class="empty-title">No participants registered yet.</div>
+    <a href="{{ url_for('add_registration', event_id=event.event_id) }}" class="empty-link">Register a participant →</a>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

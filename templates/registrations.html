@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}Registrations{% endblock %}
+
+{% block content %}
+<div class="page-content">
+
+  <div class="page-top">
+    <div>
+      <div class="page-eyebrow">R E G I S T R A T I O N S</div>
+      <h1 class="page-title">Registrations</h1>
+      <p class="page-subtitle">Manage event registrations.</p>
+    </div>
+    <a href="{{ url_for('add_registration') }}" class="btn btn-primary" id="btn-add-registration">
+      <i data-lucide="plus" class="btn-icon"></i> Register Participant
+    </a>
+  </div>
+
+  <!-- Event Filter -->
+  <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 12px; background: var(--surface); padding: 12px 20px; border-radius: var(--r); border: 1px solid var(--border); box-shadow: var(--sh-sm);">
+    <i data-lucide="filter" style="width:16px;height:16px;color:var(--muted);"></i>
+    <span style="font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em;">Filter by Event:</span>
+    <form method="GET" action="{{ url_for('registrations') }}" style="margin:0; display:flex; gap:10px; align-items:center;">
+      <select name="event_id" class="form-select" style="min-width: 240px; padding: 6px 12px; font-size: 13px; background-position: right 10px center;" onchange="this.form.submit()">
+        <option value="">All Events</option>
+        {% for e in events %}
+        <option value="{{ e.event_id }}" {% if selected_event == e.event_id | string %}selected{% endif %}>{{ e.event_name }}</option>
+        {% endfor %}
+      </select>
+    </form>
+  </div>
+
+  {% if registrations %}
+  <div class="table-container">
+    <table class="data-table" id="registrations-table">
+      <thead>
+        <tr>
+          <th class="sortable" data-type="numeric">ID <span class="sort-icon-container"><i data-lucide="arrow-up-down" class="sort-icon"></i></span></th>
+          <th class="sortable" data-type="text">Participant <span class="sort-icon-container"><i data-lucide="arrow-up-down" class="sort-icon"></i></span></th>
+          <th class="sortable" data-type="text">Event <span class="sort-icon-container"><i data-lucide="arrow-up-down" class="sort-icon"></i></span></th>
+          <th class="sortable" data-type="date">Event Date <span class="sort-icon-container"><i data-lucide="arrow-up-down" class="sort-icon"></i></span></th>
+          <th class="sortable" data-type="text">Venue <span class="sort-icon-container"><i data-lucide="arrow-up-down" class="sort-icon"></i></span></th>
+          <th class="sortable" data-type="date">Reg. Date <span class="sort-icon-container"><i data-lucide="arrow-up-down" class="sort-icon"></i></span></th>
+          <th class="sortable" data-type="text">Status <span class="sort-icon-container"><i data-lucide="arrow-up-down" class="sort-icon"></i></span></th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for reg in registrations %}
+        <tr id="registration-row-{{ reg.registration_id }}">
+          <td class="td-id">{{ reg.registration_id }}</td>
+          <td class="td-bold">{{ reg.participant_name }}</td>
+          <td>{{ reg.event_name }}</td>
+          <td>{{ reg.event_date }}</td>
+          <td>{{ reg.venue }}</td>
+          <td class="td-muted">{{ reg.registration_date }}</td>
+          <td>
+            <span class="badge badge-{{ reg.status | lower }}">{{ reg.status }}</span>
+          </td>
+          <td class="td-actions">
+            <!-- UPDATE -->
+            <a href="{{ url_for('edit_registration', registration_id=reg.registration_id) }}"
+               class="btn-action btn-edit"
+               id="btn-edit-reg-{{ reg.registration_id }}">
+              <i data-lucide="edit-3" class="btn-icon"></i> Edit
+            </a>
+
+            <!-- DELETE -->
+            <form method="POST"
+                  action="{{ url_for('delete_registration', registration_id=reg.registration_id) }}"
+                  style="margin:0; display:inline;"
+                  onsubmit="return confirmDelete('Delete this registration for {{ reg.participant_name }}?')">
+              <button type="submit"
+                      class="btn-action btn-delete"
+                      id="btn-delete-reg-{{ reg.registration_id }}">
+                <i data-lucide="trash-2" class="btn-icon"></i> Delete
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="table-container empty-state" style="border: 1px dashed var(--border); box-shadow: none; background: transparent;">
+    <div class="empty-icon-box">
+      <i data-lucide="clipboard-list" stroke-width="2"></i>
+    </div>
+    <div class="empty-title">No registrations yet.</div>
+    <a href="{{ url_for('add_registration') }}" class="empty-link">Register a participant →</a>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit Registration' if action == 'edit' else 'Register Participant' }}{% endblock %}
+
+{% block content %}
+<div class="page-content form-page">
+
+  <div class="page-top" style="margin-bottom:0;">
+    <div>
+      <div class="page-eyebrow">R E G I S T R A T I O N S</div>
+      <h1 class="page-title">{{ 'Edit Registration' if action == 'edit' else 'Register Participant' }}</h1>
+      <p class="page-subtitle">
+        {{ 'Update registration details below.' if action == 'edit' else 'Select a participant and an event to create a registration.' }}
+      </p>
+    </div>
+    <a href="{{ url_for('registrations') }}" class="btn btn-ghost">
+      <i data-lucide="arrow-left" class="btn-icon"></i> Back
+    </a>
+  </div>
+
+  <div class="form-card">
+    <form method="POST"
+          action="{{ url_for('edit_registration', registration_id=registration_id) if action == 'edit' else url_for('add_registration') }}"
+          id="registration-form" novalidate>
+
+      <div class="form-row">
+        <label for="participant_id" class="form-label">Participant <span class="form-required">*</span></label>
+        <select id="participant_id" name="participant_id" class="form-select" required>
+          <option value="">— Select a Participant —</option>
+          {% for p in participants %}
+          <option value="{{ p.participant_id }}"
+              {% if form_data.participant_id | string == p.participant_id | string %}selected{% endif %}>
+              {{ p.name }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-row">
+        <label for="event_id" class="form-label">Event <span class="form-required">*</span></label>
+        <select id="event_id" name="event_id" class="form-select" required>
+          <option value="">— Select an Event —</option>
+          {% for event in events %}
+          <option value="{{ event.event_id }}"
+              {% if form_data.event_id | string == event.event_id | string %}selected{% endif %}>
+              {{ event.event_name }} ({{ event.event_date }})
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-row">
+        <label for="registration_date" class="form-label">Registration Date <span class="form-required">*</span></label>
+        <input type="date" id="registration_date" name="registration_date" class="form-input"
+               value="{{ form_data.registration_date or '' }}" required />
+      </div>
+
+      <div class="form-row">
+        <label for="status" class="form-label">Status <span class="form-required">*</span></label>
+        <select id="status" name="status" class="form-select">
+          <option value="Registered" {% if form_data.status == 'Registered' or not form_data.status %}selected{% endif %}>Registered</option>
+          <option value="Confirmed" {% if form_data.status == 'Confirmed' %}selected{% endif %}>Confirmed</option>
+          <option value="Attended" {% if form_data.status == 'Attended' %}selected{% endif %}>Attended</option>
+          <option value="Cancelled" {% if form_data.status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+        </select>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">
+          <i data-lucide="save" class="btn-icon"></i>
+          {{ 'Update Registration' if action == 'edit' else 'Register Participant' }}
+        </button>
+        <a href="{{ url_for('registrations') }}" class="btn btn-ghost">Cancel</a>
+      </div>
+
+    </form>
+  </div>
+
+</div>
+{% endblock %}

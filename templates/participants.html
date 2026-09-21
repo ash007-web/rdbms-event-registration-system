@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Participants{% endblock %}
+
+{% block content %}
+<div class="page-content">
+
+  <div class="page-top">
+    <div>
+      <div class="page-eyebrow">P A R T I C I P A N T S</div>
+      <h1 class="page-title">Participants</h1>
+      <p class="page-subtitle">Manage registered participants.</p>
+    </div>
+    <a href="{{ url_for('add_participant') }}" class="btn btn-primary" id="btn-add-participant">
+      <i data-lucide="plus" class="btn-icon"></i> Add Participant
+    </a>
+  </div>
+
+  {% if participants %}
+  <div class="table-container">
+    <table class="data-table" id="participants-table">
+      <thead>
+        <tr>
+          <th class="sortable" data-type="numeric">ID <span class="sort-icon-container"><i data-lucide="arrow-up-down" class="sort-icon"></i></span></th>
+          <th class="sortable" data-type="text">Name <span class="sort-icon-container"><i data-lucide="arrow-up-down" class="sort-icon"></i></span></th>
+          <th class="sortable" data-type="text">Email <span class="sort-icon-container"><i data-lucide="arrow-up-down" class="sort-icon"></i></span></th>
+          <th class="sortable" data-type="text">Phone <span class="sort-icon-container"><i data-lucide="arrow-up-down" class="sort-icon"></i></span></th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in participants %}
+        <tr id="participant-row-{{ p.participant_id }}">
+          <td class="td-id">{{ p.participant_id }}</td>
+          <td class="td-bold">{{ p.name }}</td>
+          <td>{{ p.email }}</td>
+          <td>{{ p.phone }}</td>
+          <td class="td-actions">
+            <!-- UPDATE -->
+            <a href="{{ url_for('edit_participant', participant_id=p.participant_id) }}"
+               class="btn-action btn-edit"
+               id="btn-edit-participant-{{ p.participant_id }}">
+              <i data-lucide="edit-3" class="btn-icon"></i> Edit
+            </a>
+
+            <!-- DELETE -->
+            <form method="POST"
+                  action="{{ url_for('delete_participant', participant_id=p.participant_id) }}"
+                  style="margin:0; display:inline;"
+                  onsubmit="return confirmDelete('Delete participant: {{ p.name }}?')">
+              <button type="submit"
+                      class="btn-action btn-delete"
+                      id="btn-delete-participant-{{ p.participant_id }}">
+                <i data-lucide="trash-2" class="btn-icon"></i> Delete
+              </button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="table-container empty-state" style="border: 1px dashed var(--border); box-shadow: none; background: transparent;">
+    <div class="empty-icon-box">
+      <i data-lucide="users" stroke-width="2"></i>
+    </div>
+    <div class="empty-title">No participants found.</div>
+    <a href="{{ url_for('add_participant') }}" class="empty-link">Add a participant →</a>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}

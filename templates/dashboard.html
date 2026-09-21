@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-content">
+
+  <!-- ── Page Header ── -->
+  <div class="page-top">
+    <div>
+      <div class="page-eyebrow">D A S H B O A R D</div>
+      <h1 class="page-title">Dashboard</h1>
+      <p class="page-subtitle">Event Registration System — Overview</p>
+    </div>
+  </div>
+
+  <!-- ── Stat Cards ── -->
+  <div class="stats-grid">
+    <div class="stat-card stat-card-1">
+      <div class="stat-card-top">
+        <div class="stat-icon"><i data-lucide="calendar" stroke-width="2.5"></i></div>
+      </div>
+      <div>
+        <div class="stat-num" id="count-events">{{ counts.events }}</div>
+        <div class="stat-label">Total Events</div>
+      </div>
+      <div style="text-align: right; margin-top: -10px;">
+        <a href="{{ url_for('events') }}" class="stat-link">View All →</a>
+      </div>
+    </div>
+
+    <div class="stat-card stat-card-2">
+      <div class="stat-card-top">
+        <div class="stat-icon"><i data-lucide="users" stroke-width="2.5"></i></div>
+      </div>
+      <div>
+        <div class="stat-num" id="count-participants">{{ counts.participants }}</div>
+        <div class="stat-label">Total Participants</div>
+      </div>
+      <div style="text-align: right; margin-top: -10px;">
+        <a href="{{ url_for('participants') }}" class="stat-link">View All →</a>
+      </div>
+    </div>
+
+    <div class="stat-card stat-card-3">
+      <div class="stat-card-top">
+        <div class="stat-icon"><i data-lucide="clipboard-list" stroke-width="2.5"></i></div>
+      </div>
+      <div>
+        <div class="stat-num" id="count-registrations">{{ counts.registrations }}</div>
+        <div class="stat-label">Total Registrations</div>
+      </div>
+      <div style="text-align: right; margin-top: -10px;">
+        <a href="{{ url_for('registrations') }}" class="stat-link">View All →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Quick Actions ── -->
+  <h2 class="section-label">Quick Actions</h2>
+  <div class="quick-actions">
+    <a href="{{ url_for('add_event') }}" class="qa-btn qa-btn-1" id="btn-add-event">
+      <i data-lucide="plus" class="qa-icon"></i> Add Event
+    </a>
+    <a href="{{ url_for('add_participant') }}" class="qa-btn qa-btn-2" id="btn-add-participant">
+      <i data-lucide="plus" class="qa-icon"></i> Add Participant
+    </a>
+    <a href="{{ url_for('add_registration') }}" class="qa-btn qa-btn-3" id="btn-register">
+      <i data-lucide="plus" class="qa-icon"></i> Register Participant
+    </a>
+  </div>
+
+  <!-- ── Recent Registrations ── -->
+  <div class="section-header" style="margin-top: 20px;">
+    <h2 class="section-title">Recent Registrations</h2>
+    <div>
+      <a href="{{ url_for('events') }}" class="view-all-link" style="margin-right: 15px;"><i data-lucide="layers" style="width:14px;height:14px;margin-right:2px;display:inline-block;vertical-align:middle;margin-top:-2px;"></i> View by Event →</a>
+      <a href="{{ url_for('registrations') }}" class="view-all-link">View All →</a>
+    </div>
+  </div>
+
+  {% if recent_registrations %}
+  <div class="table-container">
+    <table class="data-table" id="dashboard-recent-table">
+      <thead>
+        <tr>
+          <th>Participant</th>
+          <th>Event</th>
+          <th>Date</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for reg in recent_registrations %}
+        <tr>
+          <td class="td-bold">{{ reg.participant_name }}</td>
+          <td>{{ reg.event_name }}</td>
+          <td class="td-muted">{{ reg.registration_date }}</td>
+          <td>
+            <span class="badge badge-{{ reg.status | lower }}">{{ reg.status }}</span>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="table-container empty-state" style="border: 1px dashed var(--border); box-shadow: none; background: transparent;">
+    <div class="empty-icon-box">
+      <i data-lucide="clipboard-list" stroke-width="2"></i>
+    </div>
+    <div class="empty-title">No registrations yet.</div>
+    <a href="{{ url_for('add_registration') }}" class="empty-link">Register a participant →</a>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}
