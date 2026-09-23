@@ -1,6 +1,1 @@
-# requirements.txt — Event Registration System
-# Install with: python -m pip install -r requirements.txt
-
-Flask==3.0.3
-mysql-connector-python==8.4.0
-python-dotenv==1.0.1
+mysql-connector-python
